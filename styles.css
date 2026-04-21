@@ -4,14 +4,13 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: #1a1a2e;
   background-image:
-    repeating-linear-gradient(120deg, rgba(140,100,255,0.06) 0px, rgba(140,100,255,0.06) 1px, transparent 1px, transparent 60px),
-    repeating-linear-gradient(60deg, rgba(140,100,255,0.06) 0px, rgba(140,100,255,0.06) 1px, transparent 1px, transparent 60px),
-    linear-gradient(60deg, rgba(120,60,200,0.2) 25%, transparent 25%, transparent 75%, rgba(120,60,200,0.2) 75%),
-    linear-gradient(120deg, rgba(120,60,200,0.2) 25%, transparent 25%, transparent 75%, rgba(120,60,200,0.2) 75%),
-    linear-gradient(60deg, rgba(60,140,255,0.15) 25%, transparent 25%, transparent 75%, rgba(60,140,255,0.15) 75%),
-    linear-gradient(120deg, rgba(60,140,255,0.15) 25%, transparent 25%, transparent 75%, rgba(60,140,255,0.15) 75%);
-  background-size: 240px 416px;
-  background-position: 0 0, 0 0, 0 0, 120px 208px, 0 0, 120px 208px;
+    radial-gradient(circle at 20px 20px, rgba(120,80,220,0.18) 12px, transparent 13px),
+    radial-gradient(circle at 60px 20px, rgba(120,80,220,0.18) 12px, transparent 13px),
+    radial-gradient(circle at 40px 50px, rgba(120,80,220,0.18) 12px, transparent 13px),
+    radial-gradient(circle at 20px 20px, rgba(180,140,255,0.08) 8px, transparent 9px),
+    radial-gradient(circle at 60px 20px, rgba(180,140,255,0.08) 8px, transparent 9px),
+    radial-gradient(circle at 40px 50px, rgba(180,140,255,0.08) 8px, transparent 9px);
+  background-size: 80px 66px;
   color: #ccc;
   min-height: 100vh;
   position: relative;
@@ -104,7 +103,7 @@ header h1 { font-size:1.3rem; color:#fff; }
 
 /* Vertical drive lane between sections */
 .drive-lane-v {
-  width: 14px; min-width: 14px; background: #3a3a4a; position: relative;
+  width: 24px; min-width: 24px; background: #3a3a4a; position: relative;
 }
 .drive-lane-v::after {
   content: ''; position: absolute; top:0; bottom:0; left:50%; width:2px;
@@ -120,7 +119,7 @@ header h1 { font-size:1.3rem; color:#fff; }
 
 /* Vertical aisle between paired columns */
 .aisle-h {
-  width: 10px; min-width: 10px;
+  width: 16px; min-width: 16px;
   background: #3a3a4a;
   position: relative;
 }
@@ -153,7 +152,7 @@ header h1 { font-size:1.3rem; color:#fff; }
 /* Individual spot — horizontal bar (wider than tall), like the white lines in the photo */
 .spot {
   width: 100%;
-  height: 8px;
+  height: 14px;
   background: #3e3e52;
   cursor: pointer;
   transition: all 0.1s;
@@ -200,3 +199,43 @@ header h1 { font-size:1.3rem; color:#fff; }
 .swatch { display:inline-block; width:16px; height:8px; border-radius:2px; border:1px solid #50506a; }
 .swatch.empty { background:#3e3e52; }
 .swatch.mine { background:#1c4a2a; border-color:#3fb950; }
+
+/* Mobile responsive — stack sections vertically on small screens */
+@media (max-width: 700px) {
+  .parking-area {
+    flex-direction: column;
+  }
+
+  .drive-lane-v {
+    width: 100%;
+    min-width: unset;
+    height: 14px;
+  }
+  .drive-lane-v::after {
+    top: 50%; bottom: unset; left: 0; right: 0;
+    width: auto; height: 2px;
+    background: repeating-linear-gradient(90deg, #777 0, #777 6px, transparent 6px, transparent 12px);
+  }
+
+  .section { width: 100%; }
+
+  .row-pair { flex-direction: row; }
+
+  .spot { height: 18px; }
+
+  header h1 { font-size: 1.1rem; }
+
+  .saved-banner {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .saved-info strong { font-size: 0.8rem; }
+}
+
+@media (max-width: 400px) {
+  .spot { height: 16px; }
+  .row-label { font-size: 0.4rem; }
+  .section-label { font-size: 0.5rem; }
+}
