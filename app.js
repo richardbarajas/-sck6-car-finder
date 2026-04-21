@@ -134,7 +134,7 @@ showBanner(load());
 render();
 
 // ── Little cars driving around the lot ──
-const CARS = ['🚗', '🚙', '🛻', '🚕', '🏎️'];
+const CARS = ['🚗', '🚙', '🛻', '🚕', '🏎️' ];
 
 function spawnCar() {
   const parkingArea = document.getElementById("parking-area");
@@ -249,3 +249,20 @@ gpsClearBtn.addEventListener("click", () => {
 
 // Show saved GPS on load
 showGpsBanner(loadGps());
+
+// ── Floating particles (like the SCK6 Apps dashboard) ──
+function createParticles() {
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.animationDuration = (6 + Math.random() * 10) + "s";
+    p.style.animationDelay = (Math.random() * 10) + "s";
+    p.style.transform = `rotate(${Math.random() * 360}deg)`;
+    p.style.opacity = 0.2 + Math.random() * 0.4;
+    p.style.width = (3 + Math.random() * 4) + "px";
+    p.style.height = (8 + Math.random() * 8) + "px";
+    document.body.appendChild(p);
+  }
+}
+createParticles();
