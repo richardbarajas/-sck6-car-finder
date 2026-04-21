@@ -213,27 +213,8 @@ header h1 { font-size:1.3rem; color:#fff; }
 .swatch.empty { background:#3e3e52; }
 .swatch.mine { background:#1c4a2a; border-color:#3fb950; }
 
-/* Mobile responsive — stack sections vertically on small screens */
+/* Mobile responsive — default to portrait on small screens */
 @media (max-width: 700px) {
-  .parking-area {
-    flex-direction: column;
-  }
-
-  .drive-lane-v {
-    width: 100%;
-    min-width: unset;
-    height: 14px;
-  }
-  .drive-lane-v::after {
-    top: 50%; bottom: unset; left: 0; right: 0;
-    width: auto; height: 2px;
-    background: repeating-linear-gradient(90deg, #777 0, #777 6px, transparent 6px, transparent 12px);
-  }
-
-  .section { width: 100%; }
-
-  .row-pair { flex-direction: row; }
-
   .spot { height: 18px; }
 
   header h1 { font-size: 1.1rem; }
