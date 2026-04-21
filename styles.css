@@ -239,3 +239,16 @@ header h1 { font-size:1.3rem; color:#fff; }
   .row-label { font-size: 0.4rem; }
   .section-label { font-size: 0.5rem; }
 }
+
+/* Animated cars */
+.driving-car {
+  position: absolute;
+  font-size: 0.9rem;
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
+}
+
+.parking-area {
+  position: relative;
+}

@@ -115,3 +115,60 @@ document.getElementById("find-btn").addEventListener("click", find);
 
 showBanner(load());
 render();
+
+// ── Little cars driving around the lot ──
+const CARS = ['🚗', '🚙', '🛻', '🚕', '🏎️'];
+
+function spawnCar() {
+  const parkingArea = document.getElementById("parking-area");
+  if (!parkingArea) return;
+
+  const w = parkingArea.offsetWidth;
+  const h = parkingArea.offsetHeight;
+  if (!w || !h) return;
+
+  const car = document.createElement("div");
+  car.className = "driving-car";
+  car.textContent = CARS[Math.floor(Math.random() * CARS.length)];
+  parkingArea.appendChild(car);
+
+  const horizontal = Math.random() > 0.5;
+  const duration = 5000 + Math.random() * 4000;
+
+  if (horizontal) {
+    const goRight = Math.random() > 0.5;
+    const y = Math.floor(Math.random() * (h - 16));
+    car.style.top = y + "px";
+    car.style.left = "0px";
+    const startX = goRight ? -30 : w + 30;
+    const endX = goRight ? w + 30 : -30;
+    car.style.transform = `translateX(${startX}px)` + (goRight ? '' : ' scaleX(-1)');
+
+    const anim = car.animate([
+      { transform: `translateX(${startX}px)${goRight ? '' : ' scaleX(-1)'}` },
+      { transform: `translateX(${endX}px)${goRight ? '' : ' scaleX(-1)'}` }
+    ], { duration, easing: "linear", fill: "forwards" });
+
+    anim.onfinish = () => car.remove();
+  } else {
+    const goDown = Math.random() > 0.5;
+    const x = Math.floor(Math.random() * (w - 16));
+    car.style.left = x + "px";
+    car.style.top = "0px";
+    const startY = goDown ? -30 : h + 30;
+    const endY = goDown ? h + 30 : -30;
+
+    const anim = car.animate([
+      { transform: `translateY(${startY}px)` },
+      { transform: `translateY(${endY}px)` }
+    ], { duration, easing: "linear", fill: "forwards" });
+
+    anim.onfinish = () => car.remove();
+  }
+}
+
+function carLoop() {
+  spawnCar();
+  setTimeout(carLoop, 1500 + Math.random() * 1500);
+}
+carLoop();
