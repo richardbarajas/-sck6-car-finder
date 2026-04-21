@@ -189,3 +189,63 @@ function carLoop() {
   setTimeout(carLoop, 1500 + Math.random() * 1500);
 }
 carLoop();
+
+// ── GPS Integration ──
+const GPS_KEY = "sck6-gps-pin";
+const gpsBtn = document.getElementById("gps-btn");
+const gpsBanner = document.getElementById("gps-banner");
+const gpsLoc = document.getElementById("gps-loc");
+const gpsTime = document.getElementById("gps-time");
+const navBtn = document.getElementById("nav-btn");
+const gpsClearBtn = document.getElementById("gps-clear-btn");
+
+function loadGps() {
+  const d = localStorage.getItem(GPS_KEY);
+  return d ? JSON.parse(d) : null;
+}
+
+function showGpsBanner(d) {
+  if (!d) { gpsBanner.style.display = "none"; gpsBtn.classList.remove("active"); return; }
+  gpsBanner.style.display = "flex";
+  gpsBtn.classList.add("active");
+  gpsBtn.textContent = "📍 Pin Saved!";
+  gpsLoc.textContent = `${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}`;
+  const t = new Date(d.t);
+  gpsTime.textContent = `Pinned ${t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${t.toLocaleDateString()}`;
+}
+
+gpsBtn.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    alert("GPS not supported on this browser.");
+    return;
+  }
+  gpsBtn.textContent = "📡 Getting location...";
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const d = { lat: pos.coords.latitude, lng: pos.coords.longitude, t: new Date().toISOString() };
+      localStorage.setItem(GPS_KEY, JSON.stringify(d));
+      showGpsBanner(d);
+    },
+    (err) => {
+      alert("Couldn't get your location. Make sure GPS/location is enabled.");
+      gpsBtn.textContent = "📍 Drop GPS Pin";
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+});
+
+navBtn.addEventListener("click", () => {
+  const d = loadGps();
+  if (!d) return;
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}&travelmode=walking`, "_blank");
+});
+
+gpsClearBtn.addEventListener("click", () => {
+  localStorage.removeItem(GPS_KEY);
+  gpsBanner.style.display = "none";
+  gpsBtn.classList.remove("active");
+  gpsBtn.textContent = "📍 Drop GPS Pin";
+});
+
+// Show saved GPS on load
+showGpsBanner(loadGps());
