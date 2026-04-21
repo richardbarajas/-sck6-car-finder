@@ -115,7 +115,13 @@ document.getElementById("find-btn").addEventListener("click", find);
 
 // Landscape / Portrait toggle
 const toggleBtn = document.getElementById("view-toggle");
-let isPortrait = false;
+let isPortrait = window.innerWidth <= 700;
+
+// Apply initial state
+if (isPortrait) {
+  document.getElementById("parking-area").classList.add("portrait");
+  toggleBtn.textContent = "🖥️ Landscape View";
+}
 
 toggleBtn.addEventListener("click", () => {
   isPortrait = !isPortrait;
