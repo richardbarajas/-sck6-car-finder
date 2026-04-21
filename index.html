@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Where TF did I park?</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🚗 Where TF did I park?</h1>
+    <p class="subtitle">Tap your spot when you park. Find it later.</p>
+  </header>
+
+  <div class="saved-banner" id="saved-banner" style="display:none;">
+    <span class="pin">📍</span>
+    <div class="saved-info">
+      <strong id="saved-loc"></strong>
+      <span id="saved-time"></span>
+    </div>
+    <button id="find-btn">Find</button>
+    <button id="clear-btn">Clear</button>
+  </div>
+
+  <div class="lot">
+    <div class="building">🏭 SCK6 Building</div>
+    <div class="sidewalk"></div>
+    <div class="parking-area" id="parking-area"></div>
+    <div class="entrance"><span class="arrow">▲</span> Entrance / Exit <span class="arrow">▲</span></div>
+  </div>
+
+  <div class="legend">
+    <span><i class="swatch empty"></i> Open</span>
+    <span><i class="swatch mine"></i> Your Car</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
