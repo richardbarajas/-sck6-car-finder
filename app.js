@@ -113,6 +113,17 @@ function render() {
 document.getElementById("clear-btn").addEventListener("click", clear);
 document.getElementById("find-btn").addEventListener("click", find);
 
+// Landscape / Portrait toggle
+const toggleBtn = document.getElementById("view-toggle");
+let isPortrait = false;
+
+toggleBtn.addEventListener("click", () => {
+  isPortrait = !isPortrait;
+  const pa = document.getElementById("parking-area");
+  pa.classList.toggle("portrait", isPortrait);
+  toggleBtn.textContent = isPortrait ? "🖥️ Landscape View" : "📱 Portrait View";
+});
+
 showBanner(load());
 render();
 
