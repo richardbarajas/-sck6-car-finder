@@ -8,10 +8,12 @@
 </head>
 <body>
   <header>
-    <h1>🚗 Where TF did I park?</h1>
-    <p class="subtitle">Tap your spot when you park. Find it later.</p>
-    <button class="view-toggle" id="view-toggle">📱 Portrait View</button>
-    <button class="gps-btn" id="gps-btn">📍 Drop GPS Pin</button>
+    <h1>Where TF did I <span>park</span>?</h1>
+    <p class="subtitle">SCK6 Parking Companion</p>
+    <div class="header-buttons">
+      <button class="btn" id="view-toggle">📱 Portrait View</button>
+      <button class="btn accent" id="gps-btn">📍 Drop GPS Pin</button>
+    </div>
   </header>
 
   <div class="gps-banner" id="gps-banner" style="display:none;">
@@ -20,8 +22,8 @@
       <strong id="gps-loc"></strong>
       <span id="gps-time"></span>
     </div>
-    <button id="nav-btn">🧭 Navigate</button>
-    <button id="gps-clear-btn">Clear</button>
+    <button class="btn nav" id="nav-btn">🧭 Navigate</button>
+    <button class="btn danger" id="gps-clear-btn">Clear</button>
   </div>
 
   <div class="saved-banner" id="saved-banner" style="display:none;">
@@ -30,8 +32,8 @@
       <strong id="saved-loc"></strong>
       <span id="saved-time"></span>
     </div>
-    <button id="find-btn">Find</button>
-    <button id="clear-btn">Clear</button>
+    <button class="btn" id="find-btn">Find</button>
+    <button class="btn danger" id="clear-btn">Clear</button>
   </div>
 
   <div class="lot">
