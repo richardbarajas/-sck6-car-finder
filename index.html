@@ -36,11 +36,19 @@
     <button class="btn danger" id="clear-btn">Clear</button>
   </div>
 
-  <div class="lot">
-    <div class="building">🏭 SCK6 Building</div>
-    <div class="sidewalk"></div>
-    <div class="parking-area" id="parking-area"></div>
-    <div class="entrance"><span class="arrow">▲</span> Entrance / Exit <span class="arrow">▲</span></div>
+  <div class="lot-scroll">
+    <div class="lot" id="lot">
+      <!-- Parking area + Grant Line Road on the right -->
+      <div class="lot-with-road">
+        <div class="parking-lot" id="parking-lot"></div>
+
+        <div class="road road-right">
+          <div class="road-arrows">↑<br>↑<br>↑</div>
+          <span class="road-name">Grant Line Rd</span>
+          <div class="road-arrows">↓<br>↓<br>↓</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="legend">

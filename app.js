@@ -1,23 +1,45 @@
-// SCK6 — 4 sections side by side (like the aerial photo)
-// Each section has row-pairs (two horizontal rows facing a shared aisle)
-// Each spot is a vertical rectangle
+// SCK6 lot layout matching the Google Maps view
+// 3 main sections, entrance lanes between section 1/2 and 2/3
+// Each section has row groups separated by horizontal aisles
+// Each row group has paired columns of spots with a vertical aisle
+
 const SECTIONS = [
-  { name: "Zone 1", pairs: [["1A","1B"],["1C","1D"],["1E","1F"],["1G","1H"]], spots: 14 },
-  { name: "Zone 2", pairs: [["2A","2B"],["2C","2D"],["2E","2F"],["2G","2H"]], spots: 14 },
-  { name: "Zone 3", pairs: [["3A","3B"],["3C","3D"],["3E","3F"],["3G","3H"]], spots: 14 },
-  { name: "Zone 4", pairs: [["4A","4B"],["4C","4D"],["4E","4F"],["4G","4H"]], spots: 14 },
+  {
+    name: "Zone 1",
+    groups: [
+      [["1A","1B"],["1C","1D"],["1E","1F"]],
+      [["1G","1H"],["1I","1J"],["1K","1L"]],
+    ],
+    spots: 16
+  },
+  {
+    name: "Zone 2",
+    groups: [
+      [["2A","2B"],["2C","2D"],["2E","2F"],["2G","2H"]],
+      [["2I","2J"],["2K","2L"],["2M","2N"],["2O","2P"]],
+    ],
+    spots: 16
+  },
+  {
+    name: "Zone 3",
+    groups: [
+      [["3A","3B"],["3C","3D"],["3E","3F"],["3G","3H"]],
+      [["3I","3J"],["3K","3L"],["3M","3N"],["3O","3P"]],
+    ],
+    spots: 16
+  },
 ];
 
+// Lane types between sections: "entrance" or "drive"
+const LANES = ["entrance", "entrance"];
+
 const KEY = "sck6-car-spot";
-const area = document.getElementById("parking-area");
+const lot = document.getElementById("parking-lot");
 const banner = document.getElementById("saved-banner");
 const locEl = document.getElementById("saved-loc");
 const timeEl = document.getElementById("saved-time");
 
-function load() {
-  const d = localStorage.getItem(KEY);
-  return d ? JSON.parse(d) : null;
-}
+function load() { const d = localStorage.getItem(KEY); return d ? JSON.parse(d) : null; }
 
 function save(sec, row, spot) {
   const d = { sec, row, spot, t: new Date().toISOString() };
@@ -26,11 +48,7 @@ function save(sec, row, spot) {
   render();
 }
 
-function clear() {
-  localStorage.removeItem(KEY);
-  banner.style.display = "none";
-  render();
-}
+function clear() { localStorage.removeItem(KEY); banner.style.display = "none"; render(); }
 
 function find() {
   const el = document.querySelector(".spot.selected");
@@ -42,20 +60,17 @@ function showBanner(d) {
   banner.style.display = "flex";
   locEl.textContent = `${d.sec} → Row ${d.row} → Spot ${d.spot}`;
   const t = new Date(d.t);
-  timeEl.textContent = `Parked ${t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${t.toLocaleDateString()}`;
+  timeEl.textContent = `Parked ${t.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })} · ${t.toLocaleDateString()}`;
 }
 
-function makeSpotRow(sec, rowName, dir, saved) {
-  const row = document.createElement("div");
-  row.className = `spot-row ${dir}`;
+function makeSpotCol(sec, rowName, dir, saved) {
+  const col = document.createElement("div");
+  col.className = `spot-col ${dir}`;
 
   const lbl = document.createElement("div");
-  lbl.className = "row-label";
+  lbl.className = "col-label";
   lbl.textContent = rowName;
-  row.appendChild(lbl);
-
-  const spots = document.createElement("div");
-  spots.className = "spots";
+  col.appendChild(lbl);
 
   for (let i = 1; i <= sec.spots; i++) {
     const sp = document.createElement("div");
@@ -65,132 +80,124 @@ function makeSpotRow(sec, rowName, dir, saved) {
       sp.classList.add("selected");
     }
     sp.addEventListener("click", () => save(sec.name, rowName, i));
-    spots.appendChild(sp);
+    col.appendChild(sp);
   }
-
-  row.appendChild(spots);
-  return row;
+  return col;
 }
 
 function render() {
-  area.innerHTML = "";
+  lot.innerHTML = "";
   const saved = load();
 
+  const sectionsRow = document.createElement("div");
+  sectionsRow.className = "lot-sections";
+
   SECTIONS.forEach((sec, si) => {
+    // Add lane between sections
     if (si > 0) {
       const lane = document.createElement("div");
-      lane.className = "drive-lane-v";
-      area.appendChild(lane);
+      lane.className = LANES[si - 1] === "entrance" ? "entrance-lane" : "drive-lane";
+      if (LANES[si - 1] === "entrance") {
+        const lbl = document.createElement("div");
+        lbl.className = "lane-label";
+        lbl.textContent = "▼ IN";
+        lane.appendChild(lbl);
+      }
+      sectionsRow.appendChild(lane);
     }
 
-    const sEl = document.createElement("div");
-    sEl.className = "section";
+    const secEl = document.createElement("div");
+    secEl.className = "lot-section";
 
-    const label = document.createElement("div");
-    label.className = "section-label";
-    label.textContent = sec.name;
-    sEl.appendChild(label);
+    const title = document.createElement("div");
+    title.className = "section-title";
+    title.textContent = sec.name;
+    secEl.appendChild(title);
 
-    sec.pairs.forEach(([topRow, botRow]) => {
-      const pair = document.createElement("div");
-      pair.className = "row-pair";
+    sec.groups.forEach((group, gi) => {
+      if (gi > 0) {
+        const aisle = document.createElement("div");
+        aisle.className = "h-aisle";
+        secEl.appendChild(aisle);
+      }
 
-      pair.appendChild(makeSpotRow(sec, topRow, "top", saved));
+      // Split row pairs into two halves with a mid-road
+      const half = Math.ceil(group.length / 2);
+      const firstHalf = group.slice(0, half);
+      const secondHalf = group.slice(half);
 
-      const aisle = document.createElement("div");
-      aisle.className = "aisle-h";
-      pair.appendChild(aisle);
+      const groupRow = document.createElement("div");
+      groupRow.style.display = "flex";
+      groupRow.style.flexDirection = "row";
 
-      pair.appendChild(makeSpotRow(sec, botRow, "bottom", saved));
+      // First half of pairs
+      const leftBlock = document.createElement("div");
+      leftBlock.style.flex = "1";
+      firstHalf.forEach(([leftRow, rightRow]) => {
+        const pair = document.createElement("div");
+        pair.className = "row-pair";
+        pair.appendChild(makeSpotCol(sec, leftRow, "left", saved));
+        const va = document.createElement("div");
+        va.className = "v-aisle";
+        pair.appendChild(va);
+        pair.appendChild(makeSpotCol(sec, rightRow, "right", saved));
+        leftBlock.appendChild(pair);
+      });
+      groupRow.appendChild(leftBlock);
 
-      sEl.appendChild(pair);
+      // Mid road
+      const midRoad = document.createElement("div");
+      midRoad.className = "mid-road";
+      groupRow.appendChild(midRoad);
+
+      // Second half of pairs
+      const rightBlock = document.createElement("div");
+      rightBlock.style.flex = "1";
+      secondHalf.forEach(([leftRow, rightRow]) => {
+        const pair = document.createElement("div");
+        pair.className = "row-pair";
+        pair.appendChild(makeSpotCol(sec, leftRow, "left", saved));
+        const va = document.createElement("div");
+        va.className = "v-aisle";
+        pair.appendChild(va);
+        pair.appendChild(makeSpotCol(sec, rightRow, "right", saved));
+        rightBlock.appendChild(pair);
+      });
+      groupRow.appendChild(rightBlock);
+
+      secEl.appendChild(groupRow);
     });
 
-    area.appendChild(sEl);
+    sectionsRow.appendChild(secEl);
   });
+
+  lot.appendChild(sectionsRow);
 }
 
+// Event listeners
 document.getElementById("clear-btn").addEventListener("click", clear);
 document.getElementById("find-btn").addEventListener("click", find);
 
-// Landscape / Portrait toggle
+// Portrait toggle
 const toggleBtn = document.getElementById("view-toggle");
 let isPortrait = window.innerWidth <= 700;
 
-// Apply initial state
 if (isPortrait) {
-  document.getElementById("parking-area").classList.add("portrait");
+  lot.classList.add("portrait");
   toggleBtn.textContent = "🖥️ Landscape View";
 }
 
 toggleBtn.addEventListener("click", () => {
   isPortrait = !isPortrait;
-  const pa = document.getElementById("parking-area");
-  pa.classList.toggle("portrait", isPortrait);
+  lot.classList.toggle("portrait", isPortrait);
   toggleBtn.textContent = isPortrait ? "🖥️ Landscape View" : "📱 Portrait View";
 });
 
+// Init
 showBanner(load());
 render();
 
-// ── Little cars driving around the lot ──
-const CARS = ['🚗', '🚙', '🛻', '🚕', '🏎️' ];
-
-function spawnCar() {
-  const parkingArea = document.getElementById("parking-area");
-  if (!parkingArea) return;
-
-  const w = parkingArea.offsetWidth;
-  const h = parkingArea.offsetHeight;
-  if (!w || !h) return;
-
-  const car = document.createElement("div");
-  car.className = "driving-car";
-  car.textContent = CARS[Math.floor(Math.random() * CARS.length)];
-  parkingArea.appendChild(car);
-
-  const horizontal = Math.random() > 0.5;
-  const duration = 5000 + Math.random() * 4000;
-
-  if (horizontal) {
-    const goRight = Math.random() > 0.5;
-    const y = Math.floor(Math.random() * (h - 16));
-    car.style.top = y + "px";
-    car.style.left = "0px";
-    const startX = goRight ? -30 : w + 30;
-    const endX = goRight ? w + 30 : -30;
-    car.style.transform = `translateX(${startX}px)` + (goRight ? '' : ' scaleX(-1)');
-
-    const anim = car.animate([
-      { transform: `translateX(${startX}px)${goRight ? '' : ' scaleX(-1)'}` },
-      { transform: `translateX(${endX}px)${goRight ? '' : ' scaleX(-1)'}` }
-    ], { duration, easing: "linear", fill: "forwards" });
-
-    anim.onfinish = () => car.remove();
-  } else {
-    const goDown = Math.random() > 0.5;
-    const x = Math.floor(Math.random() * (w - 16));
-    car.style.left = x + "px";
-    car.style.top = "0px";
-    const startY = goDown ? -30 : h + 30;
-    const endY = goDown ? h + 30 : -30;
-
-    const anim = car.animate([
-      { transform: `translateY(${startY}px)` },
-      { transform: `translateY(${endY}px)` }
-    ], { duration, easing: "linear", fill: "forwards" });
-
-    anim.onfinish = () => car.remove();
-  }
-}
-
-function carLoop() {
-  spawnCar();
-  setTimeout(carLoop, 1500 + Math.random() * 1500);
-}
-carLoop();
-
-// ── GPS Integration ──
+// ── GPS ──
 const GPS_KEY = "sck6-gps-pin";
 const gpsBtn = document.getElementById("gps-btn");
 const gpsBanner = document.getElementById("gps-banner");
@@ -199,10 +206,7 @@ const gpsTime = document.getElementById("gps-time");
 const navBtn = document.getElementById("nav-btn");
 const gpsClearBtn = document.getElementById("gps-clear-btn");
 
-function loadGps() {
-  const d = localStorage.getItem(GPS_KEY);
-  return d ? JSON.parse(d) : null;
-}
+function loadGps() { const d = localStorage.getItem(GPS_KEY); return d ? JSON.parse(d) : null; }
 
 function showGpsBanner(d) {
   if (!d) { gpsBanner.style.display = "none"; gpsBtn.classList.remove("active"); return; }
@@ -211,14 +215,11 @@ function showGpsBanner(d) {
   gpsBtn.textContent = "📍 Pin Saved!";
   gpsLoc.textContent = `${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}`;
   const t = new Date(d.t);
-  gpsTime.textContent = `Pinned ${t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · ${t.toLocaleDateString()}`;
+  gpsTime.textContent = `Pinned ${t.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })} · ${t.toLocaleDateString()}`;
 }
 
 gpsBtn.addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    alert("GPS not supported on this browser.");
-    return;
-  }
+  if (!navigator.geolocation) { alert("GPS not supported."); return; }
   gpsBtn.textContent = "📡 Getting location...";
   navigator.geolocation.getCurrentPosition(
     (pos) => {
@@ -226,18 +227,14 @@ gpsBtn.addEventListener("click", () => {
       localStorage.setItem(GPS_KEY, JSON.stringify(d));
       showGpsBanner(d);
     },
-    (err) => {
-      alert("Couldn't get your location. Make sure GPS/location is enabled.");
-      gpsBtn.textContent = "📍 Drop GPS Pin";
-    },
+    () => { alert("Couldn't get location. Enable GPS."); gpsBtn.textContent = "📍 Drop GPS Pin"; },
     { enableHighAccuracy: true, timeout: 10000 }
   );
 });
 
 navBtn.addEventListener("click", () => {
   const d = loadGps();
-  if (!d) return;
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}&travelmode=walking`, "_blank");
+  if (d) window.open(`https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}&travelmode=walking`, "_blank");
 });
 
 gpsClearBtn.addEventListener("click", () => {
@@ -247,22 +244,48 @@ gpsClearBtn.addEventListener("click", () => {
   gpsBtn.textContent = "📍 Drop GPS Pin";
 });
 
-// Show saved GPS on load
 showGpsBanner(loadGps());
 
-// ── Floating particles (like the SCK6 Apps dashboard) ──
-function createParticles() {
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement("div");
-    p.className = "particle";
-    p.style.left = Math.random() * 100 + "vw";
-    p.style.animationDuration = (6 + Math.random() * 10) + "s";
-    p.style.animationDelay = (Math.random() * 10) + "s";
-    p.style.transform = `rotate(${Math.random() * 360}deg)`;
-    p.style.opacity = 0.2 + Math.random() * 0.4;
-    p.style.width = (3 + Math.random() * 4) + "px";
-    p.style.height = (8 + Math.random() * 8) + "px";
-    document.body.appendChild(p);
+// ── Floating particles ──
+for (let i = 0; i < 15; i++) {
+  const p = document.createElement("div");
+  p.className = "particle";
+  p.style.left = Math.random() * 100 + "vw";
+  p.style.animationDuration = (6 + Math.random() * 10) + "s";
+  p.style.animationDelay = (Math.random() * 10) + "s";
+  p.style.opacity = 0.2 + Math.random() * 0.4;
+  document.body.appendChild(p);
+}
+
+// ── Driving cars ──
+const CARS = ['🚗','🚙','🛻','🚕','🏎️'];
+function spawnCar() {
+  const pa = document.querySelector(".lot-sections");
+  if (!pa) return;
+  const w = pa.offsetWidth, h = pa.offsetHeight;
+  if (!w || !h) return;
+  const car = document.createElement("div");
+  car.className = "driving-car";
+  car.textContent = CARS[Math.floor(Math.random() * CARS.length)];
+  pa.style.position = "relative";
+  pa.appendChild(car);
+  const horiz = Math.random() > 0.5;
+  const dur = 5000 + Math.random() * 4000;
+  if (horiz) {
+    const goR = Math.random() > 0.5;
+    car.style.top = Math.floor(Math.random() * h) + "px";
+    car.style.left = "0px";
+    const s = goR ? -20 : w + 20, e = goR ? w + 20 : -20;
+    const a = car.animate([{transform:`translateX(${s}px)`},{transform:`translateX(${e}px)`}],{duration:dur,easing:"linear",fill:"forwards"});
+    a.onfinish = () => car.remove();
+  } else {
+    car.style.left = Math.floor(Math.random() * w) + "px";
+    car.style.top = "0px";
+    const goD = Math.random() > 0.5;
+    const s = goD ? -20 : h + 20, e = goD ? h + 20 : -20;
+    const a = car.animate([{transform:`translateY(${s}px)`},{transform:`translateY(${e}px)`}],{duration:dur,easing:"linear",fill:"forwards"});
+    a.onfinish = () => car.remove();
   }
 }
-createParticles();
+function carLoop() { spawnCar(); setTimeout(carLoop, 2000 + Math.random() * 2000); }
+carLoop();
