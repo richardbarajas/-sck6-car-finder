@@ -47,7 +47,7 @@ header h1 span { color:#6ee7b7; font-weight:600; }
 
 /* Lot scroll wrapper */
 .lot-scroll {
-  overflow-x: auto;
+  overflow: auto;
   padding: 0.75rem;
 }
 
@@ -55,6 +55,8 @@ header h1 span { color:#6ee7b7; font-weight:600; }
   min-width: 800px;
   max-width: 1000px;
   margin: 0 auto;
+  transform-origin: top left;
+  transition: transform 0.3s ease;
 }
 
 /* Grant Line Road */
