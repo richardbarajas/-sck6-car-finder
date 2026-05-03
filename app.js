@@ -197,6 +197,22 @@ toggleBtn.addEventListener("click", () => {
 showBanner(load());
 render();
 
+// ── Zoom ──
+let zoomLevel = 1;
+const lotEl = document.getElementById("lot");
+const zoomInBtn = document.getElementById("zoom-in");
+const zoomOutBtn = document.getElementById("zoom-out");
+
+zoomInBtn.addEventListener("click", () => {
+  zoomLevel = Math.min(zoomLevel + 0.15, 2.5);
+  lotEl.style.transform = `scale(${zoomLevel})`;
+});
+
+zoomOutBtn.addEventListener("click", () => {
+  zoomLevel = Math.max(zoomLevel - 0.15, 0.4);
+  lotEl.style.transform = `scale(${zoomLevel})`;
+});
+
 // ── GPS ──
 const GPS_KEY = "sck6-gps-pin";
 const gpsBtn = document.getElementById("gps-btn");
@@ -250,42 +266,3 @@ showGpsBanner(loadGps());
 for (let i = 0; i < 15; i++) {
   const p = document.createElement("div");
   p.className = "particle";
-  p.style.left = Math.random() * 100 + "vw";
-  p.style.animationDuration = (6 + Math.random() * 10) + "s";
-  p.style.animationDelay = (Math.random() * 10) + "s";
-  p.style.opacity = 0.2 + Math.random() * 0.4;
-  document.body.appendChild(p);
-}
-
-// ── Driving cars ──
-const CARS = ['🚗','🚙','🛻','🚕','🏎️'];
-function spawnCar() {
-  const pa = document.querySelector(".lot-sections");
-  if (!pa) return;
-  const w = pa.offsetWidth, h = pa.offsetHeight;
-  if (!w || !h) return;
-  const car = document.createElement("div");
-  car.className = "driving-car";
-  car.textContent = CARS[Math.floor(Math.random() * CARS.length)];
-  pa.style.position = "relative";
-  pa.appendChild(car);
-  const horiz = Math.random() > 0.5;
-  const dur = 5000 + Math.random() * 4000;
-  if (horiz) {
-    const goR = Math.random() > 0.5;
-    car.style.top = Math.floor(Math.random() * h) + "px";
-    car.style.left = "0px";
-    const s = goR ? -20 : w + 20, e = goR ? w + 20 : -20;
-    const a = car.animate([{transform:`translateX(${s}px)`},{transform:`translateX(${e}px)`}],{duration:dur,easing:"linear",fill:"forwards"});
-    a.onfinish = () => car.remove();
-  } else {
-    car.style.left = Math.floor(Math.random() * w) + "px";
-    car.style.top = "0px";
-    const goD = Math.random() > 0.5;
-    const s = goD ? -20 : h + 20, e = goD ? h + 20 : -20;
-    const a = car.animate([{transform:`translateY(${s}px)`},{transform:`translateY(${e}px)`}],{duration:dur,easing:"linear",fill:"forwards"});
-    a.onfinish = () => car.remove();
-  }
-}
-function carLoop() { spawnCar(); setTimeout(carLoop, 2000 + Math.random() * 2000); }
-carLoop();
